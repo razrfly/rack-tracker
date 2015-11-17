@@ -20,6 +20,7 @@ require "rack/tracker/vwo/vwo"
 require "rack/tracker/go_squared/go_squared"
 require "rack/tracker/criteo/criteo"
 require "rack/tracker/zanox/zanox"
+require "nokogiri"
 
 module Rack
   class Tracker
@@ -45,7 +46,7 @@ module Rack
         session[EVENT_TRACKING_KEY] = env[EVENT_TRACKING_KEY]
       end
 
-      @body.each { |fragment| response.write inject(env, fragment) }
+      @body.each { |fragment| response.write inject_nokogiri(env, fragment) }
       @body.close if @body.respond_to?(:close)
 
       response.finish
@@ -65,6 +66,17 @@ module Rack
         end
       end
       response
+    end
+
+    def inject_nokogiri(env, response)
+      _response = Nokogiri::HTML(response)
+      @handlers.each(env) do |handler|
+        position = _response.at_css handler.position.to_s
+        unless position.nil?
+          position << Nokogiri::HTML::DocumentFragment.parse(handler.render)
+        end
+      end
+      _response.to_html
     end
 
     class HandlerSet

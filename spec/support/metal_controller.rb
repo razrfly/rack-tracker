@@ -14,6 +14,13 @@ class MetalController < ActionController::Metal
   append_view_path File.join(File.dirname(__FILE__), '../fixtures/views')
   layout 'application'
 
+  def turing
+    tracker do |t|
+      t.track_all_the_things like: 'turing'
+    end
+    render "metal/turing", layout: false
+  end
+
   def index
     tracker do |t|
       t.track_all_the_things like: 'no-one-else'

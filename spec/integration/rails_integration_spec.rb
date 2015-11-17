@@ -32,6 +32,6 @@ RSpec.describe "Rails Integration" do
   end
 
   it "embeds the script tag with tracking event from the controller action" do
-    expect(subject).to eql(expected_html)
+    expect(subject).to include(expected_html)
   end
 end
